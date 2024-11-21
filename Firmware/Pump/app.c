@@ -30,7 +30,7 @@ void hwbp_app_initialize(void)
     uint8_t hwH = 1;
     uint8_t hwL = 1;
     uint8_t fwH = 1;
-    uint8_t fwL = 0;
+    uint8_t fwL = 1;
     uint8_t ass = 0;
     
    	/* Start core */
@@ -234,6 +234,9 @@ void core_callback_initialize_hardware(void)
 	{
 		clr_EN_DRIVER;
 	}
+	
+	clear_sw_f();
+	clear_sw_r();
 }
 
 void core_callback_reset_registers(void)
@@ -438,12 +441,13 @@ void core_callback_t_1ms(void)
 					core_func_send_event(ADD_REG_SW_FORWARD_STATE, true);
 	
 				if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SWLIMIT)
-				{
-					if(read_SW_F)
+					set_OUT00;
+				//{
+					//if(read_SW_F)
 						set_OUT00;
-					else
-						clr_OUT00;
-				}
+					//else
+						//clr_OUT00;
+				//}
 			}
 		}
 	}
@@ -461,12 +465,13 @@ void core_callback_t_1ms(void)
 					core_func_send_event(ADD_REG_SW_REVERSE_STATE, true);
 					
 				if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SWLIMIT)
-				{
-					if(read_SW_R)
-						set_OUT00;
-					else
-						clr_OUT00;
-				}
+					set_OUT00;
+				//{
+					//if(read_SW_R)
+						//set_OUT00;
+					//else
+						//clr_OUT00;
+				//}
 			}
 		}
 	}

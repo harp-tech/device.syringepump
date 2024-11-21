@@ -91,6 +91,8 @@ ISR(PORTC_INT0_vect, ISR_NAKED)
 			app_regs.REG_SW_FORWARD_STATE = 0;
 			if(app_regs.REG_EVT_ENABLE & B_EVT_SW_FORWARD_STATE)
 				core_func_send_event(ADD_REG_SW_FORWARD_STATE, true);
+			if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SWLIMIT)
+				clr_OUT00;
 		}
 		clear_sw_f();
 	}
@@ -102,6 +104,8 @@ ISR(PORTC_INT0_vect, ISR_NAKED)
 			app_regs.REG_SW_REVERSE_STATE = 0;
 			if(app_regs.REG_EVT_ENABLE & B_EVT_SW_REVERSE_STATE)
 				core_func_send_event(ADD_REG_SW_REVERSE_STATE, true);
+			if((app_regs.REG_DO0_CONFIG & MSK_OUT0_CONF) == GM_OUT0_SWLIMIT)
+				clr_OUT00;
 		}
 		clear_sw_r();
 	}
