@@ -1,0 +1,18 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Harp.SyringePump.Design.App"
+             RequestedThemeVariant="Default"
+             Name="Harp.SyringePump">
+
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://Harp.SyringePump.Design/Styles/DefaultStyles.axaml" />
+    <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
+  </Application.Styles>
+
+  <NativeMenu.Menu>
+		<NativeMenu>
+			<NativeMenuItem Header="About Harp.SyringePump" Click="NativeMenuItem_OnClick" />
+		</NativeMenu>
+	</NativeMenu.Menu>
+</Application>

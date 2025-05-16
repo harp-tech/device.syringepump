@@ -1,0 +1,577 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:Harp.SyringePump.Design.Controls"
+             xmlns:conv="clr-namespace:Harp.SyringePump.Design.Converters"
+             xmlns:heroIcons="clr-namespace:HeroIconsAvalonia.Controls;assembly=HeroIconsAvalonia"
+             xmlns:local="clr-namespace:Harp.SyringePump;assembly=Harp.SyringePump"
+             xmlns:md="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:vm="clr-namespace:Harp.SyringePump.Design.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Harp.SyringePump.Design.Views.SyringePumpView"
+             x:DataType="vm:SyringePumpViewModel">
+
+  <UserControl.Resources>
+    <conv:EnableFlagConverter x:Key="EnableFlagConverter"/>
+  </UserControl.Resources>         
+
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:SyringePumpViewModel />
+  </Design.DataContext>
+
+  <DockPanel>
+    <Grid Margin="10" DockPanel.Dock="Top"
+          ColumnDefinitions="Auto, Auto, *, Auto, Auto"
+          RowDefinitions="30,25,*,*">
+      <TextBlock Grid.Row="0"
+                 Text="SyringePump"
+                 HorizontalAlignment="Left"
+                 VerticalAlignment="Bottom"
+                 FontWeight="Bold"
+                 FontSize="17" />
+      <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="2">
+        <TextBlock Text="{Binding AppVersion}"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom"
+                   FontWeight="Bold"
+                   FontSize="17"
+                   Margin="5,0,0,0" />
+        <Button Background="Transparent" Command="{Binding ShowAboutCommand}">
+          <heroIcons:HeroIcon Foreground="{Binding IconColor}" Type="QuestionMarkCircle" Width="14"/>
+        </Button>
+      </StackPanel>
+        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="Hardware &amp; Software Platform" HorizontalAlignment="Left"
+                       Foreground="{StaticResource BlueAccentColor}" MaxWidth="240" VerticalAlignment="Center" FontWeight="Bold" TextWrapping="WrapWithOverflow" FontSize="12" />
+        <ThemeVariantScope Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Grid.ColumnSpan="2"
+                                 RequestedThemeVariant="Light">
+          <Image VerticalAlignment="Center"
+                 HorizontalAlignment="Right"
+                 Margin="0,5,5,0"
+                 IsVisible="{Binding !IsDarkMode}"
+                 Source="/Assets/cf-logo.png" />
+        </ThemeVariantScope>
+        <ThemeVariantScope Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Grid.ColumnSpan="2"
+                           RequestedThemeVariant="Dark">
+          <Image VerticalAlignment="Center"
+                 HorizontalAlignment="Right"
+                 Margin="0,5,5,0"
+                 IsVisible="{Binding IsDarkMode}"
+                 Source="/Assets/cf-logo-white-lettering.png" />
+        </ThemeVariantScope>
+        <ToggleSwitch Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" Margin="10,0,0,0" ToolTip.Tip="Change theme"
+                            Content="Theme" FontWeight="Normal" FontSize="14"
+                            IsChecked="{Binding IsDarkMode}">
+          <ToggleSwitch.OnContent>
+            <heroIcons:HeroIcon Foreground="{Binding IconColor}" Type="Moon" Width="16" Height="16" />
+          </ToggleSwitch.OnContent>
+          <ToggleSwitch.OffContent>
+            <heroIcons:HeroIcon Foreground="{Binding IconColor}" Type="Sun" Width="16" Height="16" />
+          </ToggleSwitch.OffContent>
+        </ToggleSwitch>
+    </Grid>
+
+    <Grid DockPanel.Dock="Bottom" RowDefinitions="Auto" ColumnDefinitions="Auto,*,Auto,Auto" Margin="10">
+      <Button Grid.Row="0" Grid.Column="3"
+              Command="{Binding SaveConfigurationCommand}"
+              Content="Save configuration"
+              Margin="10,0,0,0"
+              Background="{StaticResource BlueAccentColor}"
+              Foreground="White">
+        <Button.CommandParameter>
+          <system:Boolean>false</system:Boolean>
+        </Button.CommandParameter>
+      </Button>
+      <Button Grid.Row="0" Grid.Column="2" Command="{Binding SaveConfigurationCommand}"
+              Content="Save configuration permanently">
+        <Button.CommandParameter>
+          <system:Boolean>true</system:Boolean>
+        </Button.CommandParameter>
+      </Button>
+      <Button Grid.Row="0" Grid.Column="0" Command="{Binding ResetConfigurationCommand}"
+              Content="Reset to defaults" />
+    </Grid>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" Padding="0">
+      <StackPanel Spacing="12" Margin="0,20,0,0">
+        <Panel Height="36">
+          <TextBlock Text="Device connection" VerticalAlignment="Center" FontSize="20" FontWeight="SemiBold"
+                     Margin="10,0" />
+        </Panel>
+        <Grid ColumnDefinitions="*,*,*,*,*" RowDefinitions="*,*" Margin="0,0,50,0" MinHeight="60">
+          <StackPanel Grid.RowSpan="2" VerticalAlignment="Bottom" Margin="10" Orientation="Horizontal"
+                      Spacing="20">
+            <TextBlock Text="Select a device" VerticalAlignment="Center" />
+            <ComboBox Name="Ports" ItemsSource="{Binding Ports}" SelectedItem="{Binding SelectedPort}"
+                      MinWidth="70" />
+            <Button Command="{Binding LoadDeviceInformation}">
+              <heroIcons:HeroIcon Foreground="{Binding IconColor}" Type="ArrowPath" Width="16" Height="16" />
+            </Button>
+            <Button Content="{Binding ConnectButtonText}"
+                    Command="{Binding ConnectAndGetBaseInfoCommand}" />
+            <ToggleButton Grid.Row="0" Grid.Column="2"
+                    Command="{Binding ShowMessagesCommand}">
+              <heroIcons:HeroIcon Foreground="{Binding IconColor}" Type="DocumentText" Width="16" Height="16" />
+            </ToggleButton>
+          </StackPanel>
+          <Grid Grid.Row="0" Grid.Column="1" ColumnDefinitions="25,25,30,*" RowDefinitions="*,*,*"
+                Margin="20, 0, 0, 0" IsVisible="{Binding Connected}">
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" VerticalAlignment="Center"
+                       HorizontalAlignment="Left" Text="{Binding DeviceName}" FontWeight="Bold"
+                       FontSize="24" />
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Hw " VerticalAlignment="Bottom" />
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding HardwareVersion}" FontWeight="Bold"
+                       VerticalAlignment="Bottom" />
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Fw " VerticalAlignment="Top" />
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding FirmwareVersion}" FontWeight="Bold"
+                       VerticalAlignment="Top" />
+            <TextBlock Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" Text="S/N " VerticalAlignment="Center" />
+            <TextBlock Grid.Row="1" Grid.Column="3" Grid.RowSpan="2" Text="{Binding SerialNumber}"
+                       FontWeight="Bold" VerticalAlignment="Center" />
+          </Grid>
+        </Grid>
+        <StackPanel Margin="10,10" Spacing="10">
+          <TextBlock Text="Actions" VerticalAlignment="Center" FontSize="20" FontWeight="SemiBold" />
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button ToolTip.Tip="Start Protocol" Command="{Binding StartProtocolCommand}"
+                    Background="{StaticResource BlueAccentColor}">
+              <heroIcons:HeroIcon Type="Play" Width="14" Height="14" Foreground="{Binding IconColor}"></heroIcons:HeroIcon>
+            </Button>
+            <TextBlock VerticalAlignment="Center">Start protocol</TextBlock>
+          </StackPanel>
+        </StackPanel>
+        <StackPanel>
+          <TextBlock Text="Configuration" VerticalAlignment="Center" FontSize="20" FontWeight="SemiBold"
+                     Margin="10,0" />
+          <Grid Margin="10,0,0,10" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto" RowDefinitions="*,*,*,*">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Protocol" FontSize="16" FontWeight="SemiBold" />
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="Input/Output" FontSize="16" FontWeight="SemiBold" />
+            <TextBlock Grid.Row="0" Grid.Column="2" Text="Other" FontSize="16" FontWeight="SemiBold" />
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="Events" FontSize="16" FontWeight="SemiBold" />
+
+            <!-- Events Column -->
+            <StackPanel Grid.Row="1" Grid.Column="3" Spacing="20" Margin="0,10,20,0" Orientation="Horizontal">
+              <!-- Register: EnableEvents -->
+              <StackPanel Orientation="Vertical" Spacing="10">
+                  <CheckBox IsChecked="{Binding IsStepEnabled}" 
+                            IsEnabled="True">
+                      Step
+                  </CheckBox>
+                  <CheckBox IsChecked="{Binding IsDirectionEnabled}" 
+                            IsEnabled="True">
+                      Direction
+                  </CheckBox>
+                  <CheckBox IsChecked="{Binding IsForwardSwitchEnabled}" 
+                            IsEnabled="True">
+                      ForwardSwitch
+                  </CheckBox>
+                  <CheckBox IsChecked="{Binding IsReverseSwitchEnabled}" 
+                            IsEnabled="True">
+                      ReverseSwitch
+                  </CheckBox>
+                  <CheckBox IsChecked="{Binding IsDigitalInputEnabled}" 
+                            IsEnabled="True">
+                      DigitalInput
+                  </CheckBox>
+                  <CheckBox IsChecked="{Binding IsProtocolEnabled}" 
+                            IsEnabled="True">
+                      Protocol
+                  </CheckBox>
+              </StackPanel>
+              <StackPanel Orientation="Vertical" Spacing="10">
+                <!-- <TextBlock FontSize="14" FontWeight="SemiBold" Margin="0,10">Events registers</TextBlock> -->
+                <!-- Register: Step -->
+                <StackPanel Orientation="Vertical" Spacing="10">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                    <Label FontWeight="Bold" FontSize="14" Padding="0">Step</Label>
+                    <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                        Foreground="{Binding IconColor}"
+                                        VerticalAlignment="Top">
+                      <ToolTip.Tip>Status of the STEP motor controller pin.</ToolTip.Tip>
+                    </heroIcons:HeroIcon>
+                  </StackPanel>
+                  <ComboBox SelectedItem="{Binding Step, Mode=TwoWay}"
+                            IsEnabled="True"
+                            Width="200"
+                            Margin="0,5,0,0"
+                            HorizontalAlignment="Left">
+                    <x:Static Member="local:StepState.Low" />
+                    <x:Static Member="local:StepState.High" />
+                  </ComboBox>
+                </StackPanel>
+                <!-- Register: Direction -->
+                <StackPanel Orientation="Vertical" Spacing="10">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                    <Label FontWeight="Bold" FontSize="14" Padding="0">Direction</Label>
+                    <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                        Foreground="{Binding IconColor}"
+                                        VerticalAlignment="Top">
+                      <ToolTip.Tip>Status of the DIR motor controller pin.</ToolTip.Tip>
+                    </heroIcons:HeroIcon>
+                  </StackPanel>
+                  <ComboBox SelectedItem="{Binding Direction, Mode=TwoWay}"
+                            IsEnabled="True"
+                            Width="200"
+                            Margin="0,5,0,0"
+                            HorizontalAlignment="Left">
+                    <x:Static Member="local:DirectionState.Reverse" />
+                    <x:Static Member="local:DirectionState.Forward" />
+                  </ComboBox>
+                </StackPanel>
+                <!-- Register: ForwardSwitch -->
+                <StackPanel Orientation="Vertical" Spacing="10">
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <Label FontWeight="Bold" FontSize="14" Padding="0">ForwardSwitch</Label>
+                        <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                            Foreground="{Binding IconColor}"
+                                            VerticalAlignment="Top">
+                            <ToolTip.Tip>Status of the forward limit switch.</ToolTip.Tip>
+                        </heroIcons:HeroIcon>
+                    </StackPanel>
+                    <ComboBox SelectedItem="{Binding ForwardSwitch, Mode=TwoWay}" 
+                              IsEnabled="False"
+                              Width="200" 
+                              Margin="0,5,0,0"
+                              HorizontalAlignment="Left">
+                        <x:Static Member="local:ForwardSwitchState.Low" />
+                        <x:Static Member="local:ForwardSwitchState.High" />
+                    </ComboBox>
+                </StackPanel>
+                <!-- Register: ReverseSwitch -->
+                <StackPanel Orientation="Vertical" Spacing="10">
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <Label FontWeight="Bold" FontSize="14" Padding="0">ReverseSwitch</Label>
+                        <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                            Foreground="{Binding IconColor}"
+                                            VerticalAlignment="Top">
+                            <ToolTip.Tip>Status of the reverse limit switch.</ToolTip.Tip>
+                        </heroIcons:HeroIcon>
+                    </StackPanel>
+                    <ComboBox SelectedItem="{Binding ReverseSwitch, Mode=TwoWay}" 
+                              IsEnabled="False"
+                              Width="200" 
+                              Margin="0,5,0,0"
+                              HorizontalAlignment="Left">
+                        <x:Static Member="local:ReverseSwitchState.Low" />
+                        <x:Static Member="local:ReverseSwitchState.High" />
+                    </ComboBox>
+                </StackPanel>
+                <!-- Register: DigitalInputState -->
+                <StackPanel Orientation="Vertical" Spacing="10">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                    <Label FontWeight="Bold" FontSize="14" Padding="0">DigitalInputState</Label>
+                    <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                        Foreground="{Binding IconColor}"
+                                        VerticalAlignment="Top">
+                      <ToolTip.Tip>Status of the digital input pin.</ToolTip.Tip>
+                    </heroIcons:HeroIcon>
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                    <controls:VisualStatus Status="{Binding IsDI0Enabled_DigitalInputState}"
+                                           Width="15" Height="15" />
+                    <TextBlock Text="DI0" VerticalAlignment="Center" />
+                  </StackPanel>
+                </StackPanel>
+                <!-- Register: Protocol -->
+                <StackPanel Orientation="Vertical" Spacing="10">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                    <Label FontWeight="Bold" FontSize="14" Padding="0">Protocol</Label>
+                    <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                        Foreground="{Binding IconColor}"
+                                        VerticalAlignment="Top">
+                      <ToolTip.Tip>Status of the protocol execution.</ToolTip.Tip>
+                    </heroIcons:HeroIcon>
+                  </StackPanel>
+                  <ComboBox SelectedItem="{Binding Protocol, Mode=TwoWay}"
+                            IsEnabled="False"
+                            Width="200"
+                            Margin="0,5,0,0"
+                            HorizontalAlignment="Left">
+                    <x:Static Member="local:ProtocolState.Idle" />
+                    <x:Static Member="local:ProtocolState.Running" />
+                  </ComboBox>
+                </StackPanel>
+              </StackPanel>
+            </StackPanel>
+
+            <!-- Protocol Column -->
+            <StackPanel Grid.Row="1" Grid.Column="0" Spacing="20" Margin="0,10,20,0">
+              <!-- Register: ProtocolDirection -->
+              <StackPanel Orientation="Vertical" Spacing="10">
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                  <Label FontWeight="Bold" FontSize="14" Padding="0">ProtocolDirection</Label>
+                  <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                      Foreground="{Binding IconColor}"
+                                      VerticalAlignment="Top">
+                    <ToolTip.Tip>Sets the direction of the protocol execution.</ToolTip.Tip>
+                  </heroIcons:HeroIcon>
+                </StackPanel>
+                <ComboBox SelectedItem="{Binding ProtocolDirection, Mode=TwoWay}"
+                          IsEnabled="True"
+                          Width="200"
+                          Margin="0,5,0,0"
+                          HorizontalAlignment="Left">
+                  <x:Static Member="local:ProtocolDirectionState.Reverse" />
+                  <x:Static Member="local:ProtocolDirectionState.Forward" />
+                </ComboBox>
+              </StackPanel>
+              <!-- Register: ProtocolStepCount -->
+              <StackPanel Orientation="Vertical" Spacing="10">
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                  <Label FontWeight="Bold" FontSize="14" Padding="0">ProtocolStepCount</Label>
+                  <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                      Foreground="{Binding IconColor}"
+                                      VerticalAlignment="Top">
+                    <ToolTip.Tip>Sets the number of steps to be executed in the current protocol.</ToolTip.Tip>
+                  </heroIcons:HeroIcon>
+                </StackPanel>
+                <NumericUpDown Value="{Binding ProtocolStepCount}"
+                               Minimum="1"
+                               Maximum="100"
+                               Increment="1"
+                               FormatString="F0"
+                               Width="200"
+                               HorizontalAlignment="Left"
+                               Margin="0,5,0,0" />
+              </StackPanel>
+              <!-- Register: ProtocolPeriod -->
+              <StackPanel Orientation="Vertical" Spacing="10">
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                  <Label FontWeight="Bold" FontSize="14" Padding="0">ProtocolPeriod</Label>
+                  <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                      Foreground="{Binding IconColor}"
+                                      VerticalAlignment="Top">
+                    <ToolTip.Tip>Sets the period, in ms, of of each step in the protocol.</ToolTip.Tip>
+                  </heroIcons:HeroIcon>
+                </StackPanel>
+                <NumericUpDown Value="{Binding ProtocolPeriod}"
+                               Minimum="1"
+                               Maximum="1000"
+                               Increment="1"
+                               FormatString="F0"
+                               Width="200"
+                               HorizontalAlignment="Left"
+                               Margin="0,5,0,0" />
+              </StackPanel>
+              
+              <!-- Register: EnableMotorDriver -->
+              <StackPanel Orientation="Vertical" Spacing="10">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                      <Label FontWeight="Bold" FontSize="14" Padding="0">EnableMotorDriver</Label>
+                      <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                          Foreground="{Binding IconColor}"
+                                          VerticalAlignment="Top">
+                          <ToolTip.Tip>Enables the motor driver.</ToolTip.Tip>
+                      </heroIcons:HeroIcon>
+                  </StackPanel>
+                  <CheckBox IsChecked="{Binding EnableMotorDriver,
+                            Mode=TwoWay,
+                            Converter={StaticResource EnableFlagConverter},
+                            ConverterParameter='EnableFlag'}" 
+                          Content="Enable"
+                          IsEnabled="True"
+                          HorizontalAlignment="Left" />
+              </StackPanel>
+              <!-- Register: EnableProtocol -->
+              <StackPanel Orientation="Vertical" Spacing="10">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                      <Label FontWeight="Bold" FontSize="14" Padding="0">EnableProtocol</Label>
+                      <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                          Foreground="{Binding IconColor}"
+                                          VerticalAlignment="Top">
+                          <ToolTip.Tip>Enables the currently defined protocol.</ToolTip.Tip>
+                      </heroIcons:HeroIcon>
+                  </StackPanel>
+                  <CheckBox IsChecked="{Binding EnableProtocol,
+                            Mode=TwoWay,
+                            Converter={StaticResource EnableFlagConverter},
+                            ConverterParameter='EnableFlag'}" 
+                          Content="Enable"
+                          IsEnabled="True"
+                          HorizontalAlignment="Left" />
+              </StackPanel>
+            </StackPanel>
+            
+            <!-- Input/Output Column -->
+            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="20" Margin="0,10,20,0">
+              <!-- Register: DI0Trigger -->
+              <StackPanel Orientation="Vertical" Spacing="10">
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                  <Label FontWeight="Bold" FontSize="14" Padding="0">DI0Trigger</Label>
+                  <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                      Foreground="{Binding IconColor}"
+                                      VerticalAlignment="Top">
+                    <ToolTip.Tip>Configures the callback function triggered when digital input is triggered.</ToolTip.Tip>
+                  </heroIcons:HeroIcon>
+                </StackPanel>
+                <ComboBox SelectedItem="{Binding DI0Trigger, Mode=TwoWay}"
+                          IsEnabled="True"
+                          Width="200"
+                          Margin="0,5,0,0"
+                          HorizontalAlignment="Left">
+                  <ComboBox.Resources>
+                    <conv:EnumDisplayConverter x:Key="EnumDisplayConverter">
+                      <conv:EnumDisplayConverter.Mappings>
+                        <system:String x:Key="None">Use as a pure digital input</system:String>
+                        <system:String x:Key="Step">Update STEP with a rising edge</system:String>
+                        <system:String x:Key="StartProtocol">Trigger the predefined protocol on a rising edge</system:String>
+                      </conv:EnumDisplayConverter.Mappings>
+                    </conv:EnumDisplayConverter>
+                  </ComboBox.Resources>
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding Converter={StaticResource EnumDisplayConverter}}" />
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                  <x:Static Member="local:DI0TriggerConfig.None" />
+                  <x:Static Member="local:DI0TriggerConfig.Step" />
+                  <x:Static Member="local:DI0TriggerConfig.StartProtocol" />
+                </ComboBox>
+              </StackPanel>
+              <!-- Register: DO0Sync -->
+              <StackPanel Orientation="Vertical" Spacing="10">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                      <Label FontWeight="Bold" FontSize="14" Padding="0">DO0Sync</Label>
+                      <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                          Foreground="{Binding IconColor}"
+                                          VerticalAlignment="Top">
+                          <ToolTip.Tip>Configures which signal is mimicked in the digital output 0.</ToolTip.Tip>
+                      </heroIcons:HeroIcon>
+                  </StackPanel>
+                  <ComboBox SelectedItem="{Binding DO0Sync, Mode=TwoWay}" 
+                            IsEnabled="True"
+                            Width="200" 
+                            Margin="0,5,0,0"
+                            HorizontalAlignment="Left">
+                    <ComboBox.Resources>
+                      <conv:EnumDisplayConverter x:Key="EnumDisplayConverter">
+                        <conv:EnumDisplayConverter.Mappings>
+                          <system:String x:Key="None">Digital output controlled by software</system:String>
+                          <system:String x:Key="SwitchState">High when either switch limiters is reached</system:String>
+                        </conv:EnumDisplayConverter.Mappings>
+                      </conv:EnumDisplayConverter>
+                    </ComboBox.Resources>
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource EnumDisplayConverter}}" />
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <x:Static Member="local:DO0SyncConfig.None" />
+                    <x:Static Member="local:DO0SyncConfig.SwitchState" />
+                  </ComboBox>
+              </StackPanel>
+              <!-- Register: DO1Sync -->
+              <StackPanel Orientation="Vertical" Spacing="10">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                      <Label FontWeight="Bold" FontSize="14" Padding="0">DO1Sync</Label>
+                      <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                          Foreground="{Binding IconColor}"
+                                          VerticalAlignment="Top">
+                          <ToolTip.Tip>Configures which signal is mimicked in the digital output 1.</ToolTip.Tip>
+                      </heroIcons:HeroIcon>
+                  </StackPanel>
+                  <ComboBox SelectedItem="{Binding DO1Sync, Mode=TwoWay}" 
+                            IsEnabled="True"
+                            Width="200" 
+                            Margin="0,5,0,0"
+                            HorizontalAlignment="Left">
+                    <ComboBox.Resources>
+                      <conv:EnumDisplayConverter x:Key="EnumDisplayConverter">
+                        <conv:EnumDisplayConverter.Mappings>
+                          <system:String x:Key="None">Digital output controlled by software</system:String>
+                          <system:String x:Key="Heartbeat">Toggles each second</system:String>
+                          <system:String x:Key="Step">Mimic STEP pulse</system:String>
+                        </conv:EnumDisplayConverter.Mappings>
+                      </conv:EnumDisplayConverter>
+                    </ComboBox.Resources>
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource EnumDisplayConverter}}" />
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <x:Static Member="local:DO1SyncConfig.None" />
+                    <x:Static Member="local:DO1SyncConfig.Heartbeat" />
+                    <x:Static Member="local:DO1SyncConfig.Step" />
+                  </ComboBox>
+              </StackPanel>
+              <!-- Register: DigitalOutputClear -->
+              <StackPanel Orientation="Vertical" Spacing="10">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                      <Label FontWeight="Bold" FontSize="14" Padding="0">DigitalOutputClear</Label>
+                      <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                          Foreground="{Binding IconColor}"
+                                          VerticalAlignment="Top">
+                          <ToolTip.Tip>Clear the specified digital output lines.</ToolTip.Tip>
+                      </heroIcons:HeroIcon>
+                  </StackPanel>
+                  <CheckBox IsChecked="{Binding IsDO0Enabled_DigitalOutputClear}" 
+                            IsEnabled="True">
+                      DO0
+                  </CheckBox>
+                  <CheckBox IsChecked="{Binding IsDO1Enabled_DigitalOutputClear}" 
+                            IsEnabled="True">
+                      DO1
+                  </CheckBox>
+              </StackPanel>
+              <!-- Register: DigitalOutputSet -->
+              <StackPanel Orientation="Vertical" Spacing="10">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                      <Label FontWeight="Bold" FontSize="14" Padding="0">DigitalOutputSet</Label>
+                      <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                          Foreground="{Binding IconColor}"
+                                          VerticalAlignment="Top">
+                          <ToolTip.Tip>Set the specified digital output lines.</ToolTip.Tip>
+                      </heroIcons:HeroIcon>
+                  </StackPanel>
+                  <CheckBox IsChecked="{Binding IsDO0Enabled_DigitalOutputSet}" 
+                            IsEnabled="True">
+                      DO0
+                  </CheckBox>
+                  <CheckBox IsChecked="{Binding IsDO1Enabled_DigitalOutputSet}" 
+                            IsEnabled="True">
+                      DO1
+                  </CheckBox>
+              </StackPanel>
+            </StackPanel>
+            
+            <!-- Other Column -->
+            <StackPanel Grid.Row="1" Grid.Column="2" Spacing="20" Margin="0,10,20,0">
+              <!-- Register: StepMode -->
+              <StackPanel Orientation="Vertical" Spacing="10">
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                  <Label FontWeight="Bold" FontSize="14" Padding="0">Motor microstep</Label>
+                  <heroIcons:HeroIcon Type="InformationCircle" Width="14" Height="14"
+                                      Foreground="{Binding IconColor}"
+                                      VerticalAlignment="Top">
+                    <ToolTip.Tip>Sets the motor step mode from a list of available types.</ToolTip.Tip>
+                  </heroIcons:HeroIcon>
+                </StackPanel>
+                <ComboBox SelectedItem="{Binding StepMode, Mode=TwoWay}"
+                          IsEnabled="True"
+                          Width="200"
+                          Margin="0,5,0,0"
+                          HorizontalAlignment="Left">
+                  <x:Static Member="local:StepModeType.Full" />
+                  <x:Static Member="local:StepModeType.Half" />
+                  <x:Static Member="local:StepModeType.Quarter" />
+                  <x:Static Member="local:StepModeType.Eighth" />
+                  <x:Static Member="local:StepModeType.Sixteenth" />
+                </ComboBox>
+              </StackPanel>
+            </StackPanel>
+
+            <!-- Message Control -->
+            <StackPanel Grid.Row="0" Grid.Column="4" Grid.RowSpan="2">
+              <controls:WriteMessagesControl MinWidth="500" IsVisible="{Binding ShowWriteMessages}" />
+            </StackPanel>
+          </Grid>
+        </StackPanel>
+       </StackPanel>
+     </ScrollViewer>
+  </DockPanel>
+</UserControl>
+
+
